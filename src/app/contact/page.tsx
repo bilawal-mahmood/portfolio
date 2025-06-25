@@ -4,10 +4,23 @@ import { useActionState, useRef } from 'react';
 import { submitContactForm } from '@/app/actions/contact';
 import Navbar from '@/components/Navbar';
 
-const initialState = {
+// Define the correct type
+type ContactFormState = {
+  message: string;
+  status: 'success' | 'error' | 'idle'; // added 'idle' to match initial state
+  timestamp: number;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    message?: string[];
+  };
+};
+
+const initialState: ContactFormState = {
   message: '',
   status: 'idle',
   timestamp: Date.now(),
+  errors: {},
 };
 
 export default function ContactPage() {
