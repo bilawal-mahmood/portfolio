@@ -2,18 +2,27 @@
 
 import { z } from 'zod';
 import { Resend } from 'resend';
-import { ContactFormState } from '@/types/contact';
+
+export type ContactFormState = {
+  message: string;
+  status: 'success' | 'error';
+  timestamp: number;
+  errors?: {
+    name?: string[];
+    email?: string[];
+    message?: string[];
+    _form?: string[];
+  };
+};
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Zod validation schema
 const contactFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.').max(100),
   email: z.string().email('Invalid email address.').max(100),
   message: z.string().min(10, 'Message must be at least 10 characters.').max(1000),
 });
 
-// Main action used in ContactPage
 export async function submitContactForm(
   prevState: ContactFormState,
   formData: FormData
@@ -22,7 +31,6 @@ export async function submitContactForm(
   const email = formData.get('email')?.toString() || '';
   const message = formData.get('message')?.toString() || '';
 
-  // Zod validation
   const result = contactFormSchema.safeParse({ name, email, message });
 
   if (!result.success) {
@@ -41,7 +49,6 @@ export async function submitContactForm(
 
   const { name: validName, email: validEmail, message: validMessage } = result.data;
 
-  // Fail-safe if RESEND_API_KEY is not configured
   if (!process.env.RESEND_API_KEY) {
     return {
       message: 'Server configuration error.',
