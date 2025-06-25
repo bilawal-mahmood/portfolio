@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 // Define the correct type
 type ContactFormState = {
   message: string;
-  status: 'success' | 'error' | 'idle'; // added 'idle' to match initial state
+  status: 'success' | 'error';
   timestamp: number;
   errors?: {
     name?: string[];
