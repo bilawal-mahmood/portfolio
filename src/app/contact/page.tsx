@@ -2,6 +2,8 @@
 
 import { useActionState, useRef } from 'react';
 import { submitContactForm } from '@/app/actions/contact';
+import { ContactFormState } from '@/types/contact';
+
 import Navbar from '@/components/Navbar';
 
 // Define the correct type
@@ -18,7 +20,7 @@ type ContactFormState = {
 
 const initialState: ContactFormState = {
   message: '',
-  status: 'idle',
+  status: 'success',
   timestamp: Date.now(),
   errors: {},
 };
