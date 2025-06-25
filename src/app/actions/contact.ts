@@ -13,19 +13,6 @@ const contactFormSchema = z.object({
   message: z.string().min(10, 'Message must be at least 10 characters.').max(1000),
 });
 
-// State type returned to the frontend
-export type ContactFormState = {
-  message: string;
-  status: 'success' | 'error';
-  errors?: {
-    name?: string[];
-    email?: string[];
-    message?: string[];
-    _form?: string[]; // general server error
-  };
-  timestamp?: number;
-};
-
 // Main action used in ContactPage
 export async function submitContactForm(
   prevState: ContactFormState,
@@ -35,32 +22,24 @@ export async function submitContactForm(
   const email = formData.get('email')?.toString() || '';
   const message = formData.get('message')?.toString() || '';
 
-  // Simple validation
-  const errors: ContactFormState['errors'] = {};
-  if (!name) errors.name = ['Name is required'];
-  if (!email) errors.email = ['Email is required'];
-  if (!message) errors.message = ['Message is required'];
+  // Zod validation
+  const result = contactFormSchema.safeParse({ name, email, message });
 
-  if (Object.keys(errors).length > 0) {
+  if (!result.success) {
+    const zodErrors = result.error.flatten().fieldErrors;
     return {
-      message: 'Please correct the errors.',
+      message: 'Validation failed.',
       status: 'error',
+      errors: {
+        name: zodErrors.name,
+        email: zodErrors.email,
+        message: zodErrors.message,
+      },
       timestamp: Date.now(),
-      errors,
     };
   }
 
-  // Send email or handle the form data...
-
-  return {
-    message: 'Message sent successfully!',
-    status: 'success',
-    timestamp: Date.now(),
-    errors: {},
-  };
-}
-
-  const { name, email, message } = result.data;
+  const { name: validName, email: validEmail, message: validMessage } = result.data;
 
   // Fail-safe if RESEND_API_KEY is not configured
   if (!process.env.RESEND_API_KEY) {
@@ -76,15 +55,15 @@ export async function submitContactForm(
     const { error } = await resend.emails.send({
       from: 'Portfolio Contact <onboarding@resend.dev>',
       to: ['bilawal.mahmood@gmail.com'],
-      subject: `Message from ${name}`,
+      subject: `Message from ${validName}`,
       html: `
         <h2>New Contact Message</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Name:</strong> ${validName}</p>
+        <p><strong>Email:</strong> ${validEmail}</p>
         <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
+        <p>${validMessage.replace(/\n/g, '<br>')}</p>
       `,
-      replyTo: email,
+      replyTo: validEmail,
     });
 
     if (error) {
