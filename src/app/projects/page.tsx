@@ -80,7 +80,7 @@ export default function ProjectsPage() {
             My Projects
           </h1>
           <p className="text-lg text-gray-300 text-center mb-12 max-w-2xl mx-auto font-body">
-            Here's a selection of projects I've worked on, demonstrating my skills in Unity, AR, and other technologies. Each project reflects my commitment to quality and innovation.
+            Here is a selection of projects I have worked on, demonstrating my skills in Unity, AR, and other technologies. Each project reflects my commitment to quality and innovation.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {projectsData.map((project, index) => (
