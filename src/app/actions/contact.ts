@@ -69,7 +69,7 @@ export async function submitContactForm(
         <p><strong>Message:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
       `,
-      reply_to: email,
+      replyTo: email,
     });
 
     if (error) {
