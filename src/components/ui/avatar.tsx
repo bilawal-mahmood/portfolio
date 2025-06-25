@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
@@ -19,7 +21,7 @@ Avatar.displayName = "Avatar";
 
 const AvatarImage = React.forwardRef<
   HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
+  React.ComponentProps<typeof Image>
 >(({ className, ...props }, ref) => {
   return (
     <Image
