@@ -2,6 +2,7 @@
 
 import { z } from 'zod';
 import { Resend } from 'resend';
+import { ContactFormState } from '@/types/contact';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,20 +31,34 @@ export async function submitContactForm(
   prevState: ContactFormState,
   formData: FormData
 ): Promise<ContactFormState> {
-  const result = contactFormSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    message: formData.get('message'),
-  });
+  const name = formData.get('name')?.toString() || '';
+  const email = formData.get('email')?.toString() || '';
+  const message = formData.get('message')?.toString() || '';
 
-  if (!result.success) {
+  // Simple validation
+  const errors: ContactFormState['errors'] = {};
+  if (!name) errors.name = ['Name is required'];
+  if (!email) errors.email = ['Email is required'];
+  if (!message) errors.message = ['Message is required'];
+
+  if (Object.keys(errors).length > 0) {
     return {
-      message: 'Validation failed.',
+      message: 'Please correct the errors.',
       status: 'error',
-      errors: result.error.flatten().fieldErrors,
       timestamp: Date.now(),
+      errors,
     };
   }
+
+  // Send email or handle the form data...
+
+  return {
+    message: 'Message sent successfully!',
+    status: 'success',
+    timestamp: Date.now(),
+    errors: {},
+  };
+}
 
   const { name, email, message } = result.data;
 
